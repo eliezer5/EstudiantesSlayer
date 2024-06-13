@@ -1,0 +1,26 @@
+﻿<table class="table table-striped table-bordered justify-content mt-3">
+    <thead>
+        <tr class="text-center bg-header">
+            <th>Semestre</th>
+            <th>Monto a pagar</th>
+            <th>Saldo pendiente</th>
+            <th>Estado de pago</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var semestre in Semestres)
+        {
+            <tr class="text-center">
+                <td>@semestre.Nombre</td>
+                <td>@semestre.Profesor</td>
+                <td>@semestre.Creditos</td>
+                <td>@semestre.Codigo</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+    [Parameter]
+    public List<SemestreH> Semestres { get; set; }
+}

@@ -1,0 +1,137 @@
+﻿@page "/"
+@using System.Collections.Generic
+
+<PageTitle>Home</PageTitle>
+
+<nav class="nav nav-pills flex-column flex-sm-row">
+    @foreach (var link in Links)
+    {
+        <a @onclick="@(() => OnLinkClick(link))"
+           class="@(link.IsActive ? "nav-link active" : "nav-link")"
+           href="@link.Url">
+            @link.Name
+        </a>
+    }
+</nav>
+
+<div class="container mt-3">
+    @if (!mostrarTablaNueva)
+    {
+        <h3>Tabla Actual</h3>
+        <label>Filtrar por Estado de Pago:</label>
+        <select @bind="filtroEstadoPago">
+            <option value="">Todos</option>
+            <option value="Pendiente">Pendiente</option>
+            <option value="Pagado">Pagado</option>
+        </select>
+        <table class="table table-striped table-bordered justify-content mt-3">
+            <thead>
+                <tr class="text-center bg-header">
+                    <th>Semestre</th>
+                    <th>Monto a pagar</th>
+                    <th>Saldo pendiente</th>
+                    <th>Estado de pago</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var semestre in ListaClasesFiltradas)
+                {
+                    <tr class="text-center">
+                        <td>@semestre.Semestre</td>
+                        <td>@semestre.Monto_pagar</td>
+                        <td>@semestre.Saldo_pendiente</td>
+                        <td>@semestre.Estado_pago</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    @if (mostrarTablaNueva)
+    {
+        <h3>Nueva Tabla</h3>
+        <table class="table table-striped table-bordered justify-content mt-3">
+            <thead>
+                <tr class="text-center bg-header">
+                    <th>Otro Dato</th>
+                    <th>Algo más</th>
+                    <th>Detalles</th>
+                    <th>Acción</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Agrega aquí los datos para la nueva tabla -->
+            </tbody>
+        </table>
+    }
+</div>
+
+@code {
+    public class Link
+    {
+        public string Name { get; set; }
+        public string Url { get; set; }
+        public bool IsActive { get; set; }
+    }
+
+    private List<Link> Links { get; set; } = new List<Link>()
+    {
+        new Link { Name = "Active", Url = "#", IsActive = true },
+        new Link { Name = "Longer nav link", Url = "#" },
+        new Link { Name = "Link", Url = "#" }
+    };
+
+    bool mostrarTablaNueva = false;
+    string filtroEstadoPago = "";
+
+    public List<SemestreEstudiante> ListaClases { get; set; } = new List<SemestreEstudiante>
+    {
+        new SemestreEstudiante { Semestre = "001", Monto_pagar = 20000, Saldo_pendiente = 15344, Estado_pago = "Pendiente" },
+        new SemestreEstudiante { Semestre = "002", Monto_pagar = 32222, Saldo_pendiente = 0, Estado_pago = "Pagado"   },
+        new SemestreEstudiante { Semestre = "003", Monto_pagar = 17000, Saldo_pendiente = 0, Estado_pago = "Pagado"  }
+    };
+
+    List<SemestreEstudiante> ListaClasesFiltradas
+    {
+        get
+        {
+            if (string.IsNullOrWhiteSpace(filtroEstadoPago))
+            {
+                return ListaClases;
+            }
+            else
+            {
+                return ListaClases.Where(semestre => semestre.Estado_pago.Equals(filtroEstadoPago, StringComparison.OrdinalIgnoreCase)).ToList();
+            }
+        }
+    }
+
+    public class SemestreEstudiante
+    {
+        public string Semestre { get; set; }
+        public int Monto_pagar { get; set; }
+        public int Saldo_pendiente { get; set; }
+        public string Estado_pago { get; set; }
+    }
+
+    private void OnLinkClick(Link selectedLink)
+    {
+        // Desactivar todos los enlaces
+        foreach (var link in Links)
+        {
+            link.IsActive = false;
+        }
+
+        // Activar el enlace seleccionado
+        selectedLink.IsActive = true;
+
+        // Mostrar u ocultar la tabla nueva basado en el enlace seleccionado
+        if (selectedLink.Name == "Longer nav link")
+        {
+            mostrarTablaNueva = true;
+        }
+        else
+        {
+            mostrarTablaNueva = false;
+        }
+    }
+}
