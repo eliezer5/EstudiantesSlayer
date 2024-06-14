@@ -1,4 +1,4 @@
-﻿@page "/Deudas"
+﻿@* @page "/Deudas"
 
 
 <div class="container mt-3">
@@ -30,33 +30,12 @@
             </tbody>
         </table>
     }
-    @if (mostrarTablaNueva)
-    {
-        <h3>Nueva Tabla</h3>
-        <table class="table table-striped table-bordered justify-content mt-3">
-            <thead>
-                <tr class="text-center bg-header">
-                    <th>Otro Dato</th>
-                    <th>Algo más</th>
-                    <th>Detalles</th>
-                    <th>Acción</th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- Agrega aquí los datos para la nueva tabla -->
-            </tbody>
-        </table>
-    }
+
 </div>
 
 @code {
-    bool mostrarTablaNueva = false;
+
     string filtroEstadoPago = "";
-
- 
-
-
-
 
     public List<Deudas> ListaClases { get; set; } = new List<Deudas>
     {
@@ -79,14 +58,10 @@
             }
         }
     }
-
-
     public class Deudas
     {
         public string Cuota { get; set; }
         public string Estado { get; set; }
     }
-
-    
-
 }
+ *@

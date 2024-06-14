@@ -5,19 +5,6 @@
     </div>
 
     <main>
-        <div class="top-row px-4">
-            <nav class="nav nav-pills flex-column flex-sm-row">
-                @foreach (var link in Links)
-                {
-                    <a @onclick="@(() => OnLinkClick(link))"
-                       class="@(link.IsActive ? "nav-link active" : "nav-link")"
-                       href="@link.Url">
-                        @link.Name
-                    </a>
-                }
-            </nav>
-        </div>
-
         <article class="content px-4">
             @Body
         </article>
