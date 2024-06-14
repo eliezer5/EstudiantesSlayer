@@ -15,26 +15,19 @@
 </nav>
 
 <div class="container mt-3">
-    @*condicional para mostrar ventanas*@
     @if (!mostrarTablaNueva && !MostrarDeudas)
     {
-
         <div style="display:flex; align-items:center; justify-content:space-around">
             <div>
-
                 <label class="">Filtrar por Estado de Pago:</label>
             </div>
-
             <div class="col-4">
-
                 <select class="form-select" @bind="filtroEstadoPago">
                     <option value="">Todos</option>
                     <option value="Pendiente">Pendiente</option>
                     <option value="Pagado">Pagado</option>
                 </select>
-
             </div>
-
         </div>
         <table class="table table-striped table-bordered justify-content mt-3">
             <thead Style="background-color: darkblue;">
@@ -45,7 +38,6 @@
                     <th class="text-white">Estado de pago</th>
                 </tr>
             </thead>
-            
             <tbody>
                 @foreach (var semestre in ListaClasesFiltradas)
                 {
@@ -60,16 +52,28 @@
         </table>
     }
 
-    @*condicional para mostrar ventanas*@
     @if (mostrarTablaNueva)
     {
-        
+        <div style="display:flex; align-items:center; ">
+            <div>
+                <label class="">Filtrar por Semestre:</label>
+            </div>
+            <div>
+                <select class="form-select" @bind="filtroSemestre">
+                    <option value="">Todos</option>
+                    @foreach (var semestre in SemestresDisponibles)
+                    {
+                        <option value="@semestre">@semestre</option>
+                    }
+                </select>
+            </div>
+        </div>
         <table class="table table-striped table-bordered justify-content mt-3">
             <thead Style="background-color: darkblue;">
                 <tr class="text-center bg-header">
                     <th class="text-white">Semestre</th>
                     <th class="text-white">Monto</th>
-                    <th class="text-white">m&eacute;todo de pago</th>
+                    <th class="text-white">Método de pago</th>
                 </tr>
             </thead>
             <tbody>
@@ -85,11 +89,9 @@
         </table>
     }
 
-    @*condicional para mostrar ventanas*@
     @if (MostrarDeudas && !mostrarTablaNueva || MostrarDeudas && mostrarTablaNueva)
     {
         <div class="container mt-3">
-
             <table class="table table-striped table-bordered justify-content mt-3">
                 <thead Style="background-color: darkblue;">
                     <tr class="text-center bg-header">
@@ -103,30 +105,24 @@
                     {
                         <tr class="text-center">
                             <td>@semestre.Cuota</td>
-
                             <td>@semestre.Estado</td>
                             <td>
-                                <a class="btn btn-primary" href="D_Deuda" role="button">Ver Mi Deuda</a>
+                                <a class="btn btn-primary" href="/Deudas" role="button">Ver Mi Deuda</a>
                             </td>
                         </tr>
                     }
                 </tbody>
             </table>
-
-
         </div>
     }
 </div>
 
 @code {
-
-    //variables
     bool mostrarTablaNueva = false;
     bool MostrarDeudas = false;
     string filtroEstadoPago = "";
+    string filtroSemestre = "";
 
-
-    //Datos
     private List<Link> Links { get; set; } = new List<Link>()
     {
         new Link {id= 1, Name = "Estado de cuenta", Url = "#", IsActive = true },
@@ -150,7 +146,6 @@
         new SemestreEstudiante { Semestre = "003", Monto_pagar = 17000, Saldo_pendiente = 0, Estado_pago = "Pagado"  }
     };
 
-
     public List<HistorialPagos> ListaHistorial { get; set; } = new List<HistorialPagos>
     {
         new HistorialPagos { Semestre = "enero 3-2024", Monto = 50000 , MetodoPago = "Pago Pendiente" },
@@ -158,7 +153,8 @@
         new HistorialPagos { Semestre = "marzo 3-2024", Monto = 40000 , MetodoPago = "Pago Pendiente"  }
     };
 
-    //listas
+    List<string> SemestresDisponibles => ListaHistorial.Select(h => h.Semestre).Distinct().ToList();
+
     List<SemestreEstudiante> ListaClasesFiltradas
     {
         get
@@ -174,22 +170,22 @@
         }
     }
 
-
     List<HistorialPagos> ListaHistorialPagoFiltrados
     {
         get
         {
-            if (string.IsNullOrWhiteSpace(filtroEstadoPago))
+            var listaFiltrada = ListaHistorial.AsQueryable();
+            if (!string.IsNullOrWhiteSpace(filtroEstadoPago))
             {
-                return ListaHistorial;
+                listaFiltrada = listaFiltrada.Where(semestre => semestre.MetodoPago.Equals(filtroEstadoPago, StringComparison.OrdinalIgnoreCase));
             }
-            else
+            if (!string.IsNullOrWhiteSpace(filtroSemestre))
             {
-                return ListaHistorial.Where(semestre => semestre.MetodoPago.Equals(filtroEstadoPago, StringComparison.OrdinalIgnoreCase)).ToList();
+                listaFiltrada = listaFiltrada.Where(semestre => semestre.Semestre.Equals(filtroSemestre, StringComparison.OrdinalIgnoreCase));
             }
+            return listaFiltrada.ToList();
         }
     }
-
 
     List<Deudas> ListaDeudasFiltradas
     {
@@ -206,7 +202,6 @@
         }
     }
 
-    //clases
     public class Link
     {
         public int id { get; set; }
@@ -236,25 +231,19 @@
         public string MetodoPago { get; set; }
     }
 
-    //Logica para ocultar las ventanas en la misma pagina
     private void OnLinkClick(Link selectedLink)
     {
-        // Desactivar todos los enlaces
         foreach (var link in Links)
         {
             link.IsActive = false;
         }
 
-        // Activar el enlace seleccionado
         selectedLink.IsActive = true;
 
-        // Mostrar u ocultar la tabla nueva basado en el enlace seleccionado
         if (selectedLink.id == 1)
         {
             mostrarTablaNueva = false;
         }
-
-
         if (selectedLink.id == 2)
         {
             mostrarTablaNueva = true;
@@ -262,14 +251,13 @@
         }
         else if (selectedLink.id == 5)
         {
-            MostrarDeudas = true; 
+            MostrarDeudas = true;
             mostrarTablaNueva = false;
         }
         else
         {
             mostrarTablaNueva = false;
             MostrarDeudas = false;
-
         }
     }
 }
